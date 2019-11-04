@@ -2,15 +2,15 @@ import asyncio
 import aiohttp
 
 
-def prepared_data(params=None):
+def prepared_data(data=None):
     """function should be used(in future) to add custom headers to data."""
-    data = aiohttp.FormData()
+    payload = aiohttp.FormData()
 
-    if params:
-        for key, value in params.items():
-            data.add_field(key, str(value))
+    if data:
+        for key, value in data.items():
+            payload.add_field(key, str(value))
 
-    return data
+    return payload
 
 
 class BaseClient:
@@ -22,16 +22,16 @@ class BaseClient:
         self.headers = headers
 
 
-    async def _request(self, method, api_url, params=None, data=None, **kwargs):
+    async def _request(self, method, api_url, params=None, body=None, **kwargs):
         url = f'{self._host}/{api_url}'
-        print(f'Make request: "{url}" with data: "{data}" ')
+        print(f'Make request: "{url}" with data: "{body}" ')
 
-        if data:
-            data = prepared_data(data)
+        if body:
+            body = prepared_data(body)
 
         try:
-            async with self.session.request(method, url, data=data, params=params, headers=self.headers, **kwargs) as response:
-                return response.content_type, response.status, await response.text()
+            async with self.session.request(method, url, data=body, params=params, headers=self.headers, **kwargs) as response:
+                return response
 
         except aiohttp.ClientError as e:
             raise Exception(f"Client error: {e.__class__.__name__}: {e}")
@@ -43,18 +43,18 @@ class BaseClient:
         return response
 
 
-    async def post(self, api_url, params=None, data=None, **kwargs):
-        response = await self._request('POST', api_url, params, data, **kwargs)
+    async def post(self, api_url, params=None, body=None, **kwargs):
+        response = await self._request('POST', api_url, params, body, **kwargs)
 
         return response
 
-    async def put(self, api_url, params=None, data=None, **kwargs):
-        response = await self._request('PUT', api_url, params, data, **kwargs)
+    async def put(self, api_url, params=None, body=None, **kwargs):
+        response = await self._request('PUT', api_url, params, body, **kwargs)
 
         return response
 
-    async def patch(self, api_url, params=None, data=None, **kwargs):
-        response = await self._request('PATCH', api_url, params, data, **kwargs)
+    async def patch(self, api_url, params=None, body=None, **kwargs):
+        response = await self._request('PATCH', api_url, params, body, **kwargs)
 
         return response
 
