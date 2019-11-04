@@ -31,14 +31,14 @@ class BaseClient:
 
         try:
             async with self.session.request(method, url, data=data, params=params, headers=self.headers, **kwargs) as response:
-                return response.content_type, response.status, await response.text()
+                return response
 
         except aiohttp.ClientError as e:
             raise Exception(f"Client error: {e.__class__.__name__}: {e}")
 
 
-    async def get(self, api_url, params, **kwargs):
-        response = await self._request('GET', api_url, params, **kwargs)
+    async def get(self, api_url, params, data=None, **kwargs):
+        response = await self._request('GET', api_url, params, data, **kwargs)
 
         return response
 
@@ -58,7 +58,7 @@ class BaseClient:
 
         return response
 
-    async def delete(self, api_url, params, **kwargs):
-        response = await self._request('DELETE', api_url, params, **kwargs)
+    async def delete(self, api_url, params, data=None, **kwargs):
+        response = await self._request('DELETE', api_url, params, data=None, **kwargs)
 
         return response
