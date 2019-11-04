@@ -60,7 +60,6 @@ class BaseClientSSO(BaseClient):
 
 # example
 if __name__ == "__main__":
-
     async def main():
         async with aiohttp.ClientSession() as session:
             custom_headers = {'Content-Type': 'application/x-www-form-urlencoded'}
