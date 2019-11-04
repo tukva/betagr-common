@@ -2,95 +2,63 @@ import asyncio
 import aiohttp
 
 
-def prepare_data(params=None):
-    data = aiohttp.FormData(quote_fields=False)
+def prepared_data(params=None):
+    """function should be used(in future) to add custom headers to data."""
+    data = aiohttp.FormData()
 
     if params:
         for key, value in params.items():
             data.add_field(key, str(value))
 
+    return data
 
 
 class BaseClient:
 
-    _host = 'https://www.google.com'
-    headers = None
+    _host = None
 
-    async def request(self, session, api_url, data=None, **kwargs):
+    def __init__(self, session, headers):
+        self.session = session
+        self.headers = headers
+
+
+    async def _request(self, method, api_url, params=None, data=None, **kwargs):
         url = f'{self._host}/{api_url}'
+        print(f'Make request: "{url}" with data: "{data}" ')
 
-        print(f'Make request: "{api_url}" \nwith data: "{data}" ')
+        if data:
+            data = prepared_data(data)
 
-        data = prepare_data(data)
         try:
-            async with session.post(url, data=data, headers=self.headers, **kwargs) as response:
-                return (response.content_type, response.status, await response.text())
+            async with self.session.request(method, url, data=data, params=params, headers=self.headers, **kwargs) as response:
+                return response.content_type, response.status, await response.text()
 
         except aiohttp.ClientError as e:
             raise Exception(f"Client error: {e.__class__.__name__}: {e}")
 
-    # def __init__(self,):
-    #     self.username = username
-    #     self.password = password
-        
 
-    # async def get(self, api_path, params, *args, **kwargs):
-    #     request = {
-    #             'url': f'{self.host}/{api_path}',
-    #             'params': params   
-    #         }
+    async def get(self, api_url, params, **kwargs):
+        response = await self._request('GET', api_url, params, **kwargs)
 
-    #     async with aiohttp.ClientSession() as session:
-    #         async with session.get(*args, **request, **kwargs) as resp:
-    #             print(resp.status)
-
-    #             return await resp
+        return response
 
 
-    # response = self.session(
-    #     url=f'{host}/{api_path}',
-    #     method="GET",
-    #     params=params,
-    #     token=self.token
-    # )
+    async def post(self, api_url, params=None, data=None, **kwargs):
+        response = await self._request('POST', api_url, params, data, **kwargs)
 
-    # return response
+        return response
 
-    # async def post(self, api_path, data, token):
-    # response = self.session(
-    #     url=host + api_path,
-    #     method="POST",
-    #     data=serialize(data),
-    #     token=self.token
-    # )
+    async def put(self, api_url, params=None, data=None, **kwargs):
+        response = await self._request('PUT', api_url, params, data, **kwargs)
 
-    # return response
+        return response
 
-    # async def put(self, api_path, data, token):
-    # response = self.session(
-    #     url=host + api_path,
-    #     method="PUT",
-    #     data=serialize(data),
-    #     token=self.token,
-    # )
+    async def patch(self, api_url, params=None, data=None, **kwargs):
+        response = await self._request('PATCH', api_url, params, data, **kwargs)
 
-    # return response
+        return response
 
-    # async def patch(self, api_path, data, token):
-    # response = self.session(
-    #     url=host + api_path,
-    #     method="PATCH",
-    #     data=serialize(data),
-    #     token=self.token
-    # )
+    async def delete(self, api_url, params, **kwargs):
+        response = await self._request('DELETE', api_url, params, **kwargs)
 
-    # return response
-
-    # async def delete(self, api_path, token):
-    # response = self.session(
-    #     url=host + api_path,
-    #     method="DELETE",
-    #     token=self.token
-    # )
-
-    # return response
+        return response
