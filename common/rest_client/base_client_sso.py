@@ -68,7 +68,7 @@ if __name__ == "__main__":
             response = await sso_client.sign_up('john doe', 'qwerty')
             print(response)
 
-            response = await sso_client.sign_in('john doe', 'qwerty')
+            response = await sso_client.sign_in()
             print(response)
 
             response = await sso_client.reset_password('asdfgh')
