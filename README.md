@@ -98,4 +98,11 @@ async def main():
     loop.run_until_complete(main())
 
 ```
-...
+Environment variables are used to determine url parameters in base classes:
+|               .env             |         value         |
+|               ---              |          ---          |
+| BASE_API_HOST                  |  'http://example.com' |
+| BASE_API_PORT                  |          8080         |
+| SSO_API_HOST                   | 'http://example.com'  |
+| SSO_API_PORT                   |         8080          |
+| COMMON_API_CLIENT_LOGGING_MODE | 0, 10, 20, 30, 40, 50 |

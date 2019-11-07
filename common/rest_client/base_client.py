@@ -2,7 +2,7 @@ import os
 import aiohttp
 import logging
 
-from utils import utils, logger
+from ..utils import utils, logger
 
 
 class BaseClient:
