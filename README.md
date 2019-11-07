@@ -1,4 +1,4 @@
-# BetAgr-Api-Common - base async api-clients for betagr-project wrote with aiohttp
+# BetAgr-common - base async api-clients for betagr-project wrote with aiohttp
 
 A set of tools, utilities and base async api-classes for maintaining the infrastructure of betagr-project services.
 
@@ -9,7 +9,7 @@ A set of tools, utilities and base async api-classes for maintaining the infrast
 
 ### Usage
 
-BetAgr-Api-Common ships with two base api-classes: BaseClient and BaseClientSSO.
+BetAgr-common ships with two base api-classes: BaseClient and BaseClientSSO.
 
 ##### BaseClient
 
@@ -30,7 +30,7 @@ class BakeryClient(BaseClient):
         return response
 ```
 
-```
+```python
     async def main():
         async for client in db_clients_orders:
             custom_headers = {'Content-Type': 'application/json'}
@@ -55,7 +55,7 @@ Api abstraction for sso-client with the release of basic methods:
 
 ``BaseClientSSO._api_uri`` should be used to represent method and relevant api path.
 For default it looks like:
-```
+```python
 BaseClientSSO._api_uri = {
             'sign_up': 'sign-up',
             'sign_in': 'sign-in',
@@ -64,9 +64,9 @@ BaseClientSSO._api_uri = {
         }
 ```
 
-Use ``sef._api_uri.apdate({'my_new_method': 'new-api'})``  - it is some kind of bookmark that makes it easy to maintain your inherited classes.
+Use ``sef._api_uri.apdate({'my_new_method': 'api_uri'})``  - it is some kind of bookmark that makes it easy to maintain your inherited classes.
 
-```
+```python
 async def main():
 
         custom_headers = {'Content-Type': 'application/x-www-form-urlencoded'}

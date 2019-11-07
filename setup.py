@@ -4,14 +4,14 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="betagr-api-common-AdsoiIo", # Replace with your own username
+    name="betagr-common",
     version="0.1.0",
     author="AndsoiIo",
     author_email="andsoiio@gmail.com",
     description="API-Common package for betagr-project.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/AndsoiIo/betagr-api-common",
+    url="https://github.com/AndsoiIo/betagr-common",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
