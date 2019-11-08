@@ -6,7 +6,9 @@ from .base_client import BaseClient
 class BaseClientSSO(BaseClient):
     """Base api client that describes full standard api for SSO service.
     _api_uri should contains the [key:value, ..] in form [method_name: api_uri which is used by the method, ..]"""
+    
     _host = os.getenv('SSO_API_HOST')
+    _port = os.getenv('SSO_API_PORT')
 
     def __init__(self, headers):
         super().__init__(headers=headers)
