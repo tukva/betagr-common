@@ -9,6 +9,13 @@ A set of tools, utilities and base async api-classes for maintaining the infrast
 
 ### Usage
 
+```python
+python3 -m pip install --user betagr-common
+
+# or for pipenv
+pipenv install betagr-common
+```
+
 BetAgr-common ships with two base api-classes: BaseClient and BaseClientSSO.
 
 ##### BaseClient
@@ -18,32 +25,39 @@ It is a base class provides a basic REST API methods which are simple wrapper ov
 
 Api-clients of each  services should be inherited from the BaseClient.
 
-```
+```python
+from common.rest_client import BaseClient
+
 class BakeryClient(BaseClient):
     _host = 'www.some-bakery.com'
 
     async def bake_bread(self, bread_flour='first-grade'):
         body = {'flour': bread_flour}
+        url = 'api/bake-bread'
         response = await super().post(url, body=body, cookies=self._cookies)
+        # if you receive a cookies
+        # make sure you updated them in your client instance
         self.update_cookies(response.cookies or {})
 
         return response
 ```
 
 ```python
-    async def main():
-        async for client in db_clients_orders:
-            custom_headers = {'Content-Type': 'application/json'}
+import asyncio
 
-            bakery_client = BakeryClient(custom_headers)
-            
-            bread_flour_type = client['flour']            
+async def main():
+    async for client in db_clients_orders:
+        custom_headers = {'Content-Type': 'application/json'}
 
-            response = await bakery_client.bake_bread(bread_flour_type)
-            print(response)    # bread was bake!
+        bakery_client = BakeryClient(custom_headers)
+        
+        bread_flour_type = client['flour']            
 
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())  
+        response = await bakery_client.bake_bread(bread_flour_type)
+        print(response)    # bread was bake!
+
+loop = asyncio.get_event_loop()
+loop.run_until_complete(main())  
 ```
 
 ##### BaseClientSSO
@@ -64,41 +78,43 @@ BaseClientSSO._api_uri = {
         }
 ```
 
-Use ``sef._api_uri.apdate({'my_new_method': 'api_uri'})``  - it is some kind of bookmark that makes it easy to maintain your inherited classes.
+Use ``sef._api_uri.update({'my_new_method': 'api_uri'})``  - it is some kind of bookmark that makes it easy to maintain your inherited classes.
 
 ```python
+import asyncio
+
 async def main():
+    custom_headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+    sso_client_one = BaseClientSSO(custom_headers)
 
-        custom_headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-        sso_client_one = BaseClientSSO(custom_headers)
+    body = {'username': 'john doe',
+            'password': 'qwerty'}
 
-        body = {'username': 'john doe',
-                'password': 'qwerty'}
+    response = await sso_client_one.sign_up(body)
+    print(response)
 
-        response = await sso_client_one.sign_up(body)
-        print(response)
+    body = {'username': 'john doe',
+            'password': 'qwerty'}
 
-        body = {'username': 'john doe',
-                'password': 'qwerty'}
+    response = await sso_client_one.sign_in(body)
+    print(response)
 
-        response = await sso_client_one.sign_in(body)
-        print(response)
+    body = {'username': 'john doe',
+            'old_password': 'qwerty',
+            'new_password': 'qwerty'}
 
-        body = {'username': 'john doe',
-                'old_password': 'qwerty',
-                'new_password': 'qwerty'}
+    response = await sso_client_one.reset_password(body)
+    print(response)
 
-        response = await sso_client_one.reset_password(body)
-        print(response)
+    response = await sso_client_one.sign_out()
+    print(response)
 
-        response = await sso_client_one.sign_out()
-        print(response)
-
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())
+loop = asyncio.get_event_loop()
+loop.run_until_complete(main())
 
 ```
-Environment variables are used to determine url parameters in base classes:
+Environment variables are used to determine url/connection parameters in base classes:
+
 |               .env             |         value         |
 |               ---              |          ---          |
 | BASE_API_HOST                  |  'http://example.com' |
