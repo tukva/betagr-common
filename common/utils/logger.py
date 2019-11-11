@@ -23,10 +23,10 @@ def start_logging(client):
                  f' host - {client.url},'
                  f' headers - {client.headers}')
 
-def log_response(client, response):
+def response(client, response):
     status = response.status
     reason = response.reason
 
-    msg = f'reponse for {client.__class__.__name__}: "{status} {reason}"'
+    msg = f'response for {client.__class__.__name__}: "{status} {reason}"'
 
     logging.info(msg)

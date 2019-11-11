@@ -2,7 +2,7 @@ import os
 import aiohttp
 import logging
 
-from ..utils import utils, logger
+from utils import logger as log
 
 
 class BaseClient:
@@ -13,8 +13,8 @@ class BaseClient:
     def __init__(self, headers):
         self.headers = headers
         self._cookies = {}
-        self._url = f'{self._host}:{self._port}'
-        logger.start_logging(client=self)
+        self._url = f'{self._host}:{self._port}/'
+        log.start_logging(client=self)
 
 
     @property
@@ -41,60 +41,61 @@ class BaseClient:
             logging.error(f"Client [update cookie] error: {e.__class__.__name__}: {e}", exc_info=True)
 
 
-    async def _request(self, method, api_uri, params=None, body=None, **kwargs):
-        """ Just a simple wrapper under aiohttp.request method.
-        :param method: str,
-        :param api_uri:  str,
-        :param params: Optional[Mapping[str, str]]=None,
-        :param body: key/value container=None,
-        :return: ClientResponse
-        """
-        url = utils.full_url(self.url, api_uri, params)
-
-        logging.info(f'Request by {self.__class__.__name__}: '
-                     f'"{method} {url}" with data: "{body}" ')
-
-        body = utils.prepared_data(body)
-
+    async def get(self, api_uri, params=None, **kwargs):
         try:
-            async with aiohttp.request(method, url, data=body, params=params, headers=self.headers, **kwargs) as response:
-                return response
+            url = self.url + api_uri
+            async with aiohttp.request("GET", url, params=params, **kwargs) as resp:
+                log.response(self, resp)
+                return resp, await resp.read()
 
         except aiohttp.ClientError as e:
             logging.error(f"Client error: {e.__class__.__name__}: {e}", exc_info=True)
             raise Exception(f"Client error: {e.__class__.__name__}: {e}")
 
 
-    async def get(self, api_uri, params, **kwargs):
-        response = await self._request('GET', api_uri, params, **kwargs)
-        logger.log_response(self, response)
+    async def post(self, api_uri, params=None, data=None, **kwargs):
+        try:
+            url = self.url + api_uri
+            async with aiohttp.request("POST", url, params=params, data=data, **kwargs) as resp:
+                log.response(self, resp)
+                return resp, await resp.read()
 
-        return response
-
-
-    async def post(self, api_uri, params=None, body=None, **kwargs):
-        response = await self._request('POST', api_uri, params, body, **kwargs)
-        logger.log_response(self, response)
-
-        return response
+        except aiohttp.ClientError as e:
+            logging.error(f"Client error: {e.__class__.__name__}: {e}", exc_info=True)
+            raise Exception(f"Client error: {e.__class__.__name__}: {e}")
 
 
-    async def put(self, api_uri, params=None, body=None, **kwargs):
-        response = await self._request('PUT', api_uri, params, body, **kwargs)
-        logger.log_response(self, response)
+    async def put(self, api_uri, params=None, data=None, **kwargs):
+        try:
+            url = self.url + api_uri
+            async with aiohttp.request("PUT", url, params=params, data=data, **kwargs) as resp:
+                log.response(self, resp)
+                return resp, await resp.json()
 
-        return response
-
-
-    async def patch(self, api_uri, params=None, body=None, **kwargs):
-        response = await self._request('PATCH', api_uri, params, body, **kwargs)
-        logger.log_response(self, response)
-
-        return response
+        except aiohttp.ClientError as e:
+            logging.error(f"Client error: {e.__class__.__name__}: {e}", exc_info=True)
+            raise Exception(f"Client error: {e.__class__.__name__}: {e}")
 
 
-    async def delete(self, api_uri, params, **kwargs):
-        response = await self._request('DELETE', api_uri, params, **kwargs)
-        logger.log_response(self, response)
+    async def patch(self, api_uri, params=None, data=None, **kwargs):
+        try:
+            url = self.url + api_uri
+            async with aiohttp.request("patch", url, params=params, data=data, **kwargs) as resp:
+                log.response(self, resp)
+                return resp, await resp.json()
 
-        return response
+        except aiohttp.ClientError as e:
+            logging.error(f"Client error: {e.__class__.__name__}: {e}", exc_info=True)
+            raise Exception(f"Client error: {e.__class__.__name__}: {e}")
+
+
+    async def delete(self, api_uri, params=None, **kwargs):
+        try:
+            url = self.url + api_uri
+            async with aiohttp.request("DELETE", url, params=params, **kwargs) as resp:
+                log.response(self, resp)
+                return resp, await resp.json()
+
+        except aiohttp.ClientError as e:
+            logging.error(f"Client error: {e.__class__.__name__}: {e}", exc_info=True)
+            raise Exception(f"Client error: {e.__class__.__name__}: {e}")

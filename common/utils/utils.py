@@ -17,17 +17,3 @@ def prepared_data(data=None):
         payload.add_field(key, str(value))
 
     return payload
-
-
-def full_url(host, api_uri, params=None):
-    """ Create full url from host, api path and query params
-    :param host: str,
-    :param api_uri: str,
-    :param params: Optional[str]=None
-    :return: str
-    """
-    url = f'{host}/{api_uri}'
-    if params:
-        url += f'?{params}'
-
-    return url
