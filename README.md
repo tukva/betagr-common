@@ -4,13 +4,16 @@ A set of tools, utilities and base async api-classes for maintaining the infrast
 
 ### Requirements
 
-* python>=3.6
+* python>=3.7
 * aiohttp>=3.6
 
 ### Usage
 
-```python
-python3 -m pip install --user betagr-common
+```
+pip install betagr-common
+
+# or only for user
+python -m pip install --user betagr-common
 
 # or for pipenv
 pipenv install betagr-common
@@ -29,32 +32,37 @@ Api-clients of each  services should be inherited from the BaseClient.
 from common.rest_client import BaseClient
 
 class BakeryClient(BaseClient):
-    _host = 'www.some-bakery.com'
+    def __init__(self, headers):
+        super().__init__(host='www.some-bakery.com', port=8000, headers=headers)
+        self.api_uris = {
+            'bake_bread' : 'api/bake-bread',
+        }
 
     async def bake_bread(self, bread_flour='first-grade'):
         body = {'flour': bread_flour}
-        url = 'api/bake-bread'
-        response = await super().post(url, body=body, cookies=self._cookies)
-        # if you receive a cookies
-        # make sure you updated them in your client instance
-        self.update_cookies(response.cookies or {})
+        api_uri = self.api_uris['bake-bread']
 
-        return response
+        return await super().post(api_uri, body=body, cookies=self._cookies)
 ```
 
 ```python
 import asyncio
+import BakeryClient
+
+db_orders = {'John Doe': {'flour': 'first-grade'},
+                     'Anderson': {'flour': 'second-grade'}}
 
 async def main():
-    async for client in db_clients_orders:
+    async for client in db_orders:
         custom_headers = {'Content-Type': 'application/json'}
 
         bakery_client = BakeryClient(custom_headers)
         
-        bread_flour_type = client['flour']            
+        bread_flour_type = db_orders[client].get('flour')            
 
-        response = await bakery_client.bake_bread(bread_flour_type)
-        print(response)    # bread was bake!
+        async with await bakery_client.bake_bread(bread_flour_type) as resp:
+            assert resp.status == 200    # bread was bake!
+                        
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(main())  
@@ -67,47 +75,53 @@ Api abstraction for sso-client with the release of basic methods:
 * sign_out
 * reset_password
 
-``BaseClientSSO._api_uri`` should be used to represent method and relevant api path.
+``BaseClientSSO.api_uris`` should be used to represent method and relevant api path.
 For default it looks like:
 ```python
-BaseClientSSO._api_uri = {
+BaseClientSSO.api_uris = {
             'sign_up': 'sign-up',
             'sign_in': 'sign-in',
             'sign_out': 'sign-out',
             'reset_password': 'reset-password',
-        }
+            }
 ```
 
-Use ``sef._api_uri.update({'my_new_method': 'api_uri'})``  - it is some kind of bookmark that makes it easy to maintain your inherited classes.
+Use ``sef.api_uris.update({'my_new_method': 'api_uri_used_in_method'})``  - it is some kind of bookmark that makes it easy to maintain your inherited classes.
 
 ```python
+import os
 import asyncio
+from common.rest_client import BaseClientSSO
+
 
 async def main():
-    custom_headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-    sso_client_one = BaseClientSSO(custom_headers)
+    host = os.getenv('SSO_API_HOST')
+    port = os.getenv('SSO_API_PORT')
+    headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+    
+    sso_client = BaseClientSSO(host, port, headers)
 
     body = {'username': 'john doe',
             'password': 'qwerty'}
 
-    response = await sso_client_one.sign_up(body)
-    print(response)
+    async with await sso_client.sign_up(body) as response:
+        print(response)
 
     body = {'username': 'john doe',
             'password': 'qwerty'}
 
-    response = await sso_client_one.sign_in(body)
-    print(response)
+    async with await sso_client.sign_in(body) as response:
+        print(response)
 
     body = {'username': 'john doe',
             'old_password': 'qwerty',
             'new_password': 'qwerty'}
 
-    response = await sso_client_one.reset_password(body)
-    print(response)
+    async with await sso_client.reset_password(body) as response:
+        print(response)
 
-    response = await sso_client_one.sign_out()
-    print(response)
+    async with await sso_client.sign_out() as response:
+        print(response)
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(main())
@@ -115,10 +129,7 @@ loop.run_until_complete(main())
 ```
 Environment variables are used to determine url/connection parameters in base classes:
 
-|               .env             |         value         |
-|               ---              |          ---          |
-| BASE_API_HOST                  |  'http://example.com' |
-| BASE_API_PORT                  |          8080         |
-| SSO_API_HOST                   | 'http://example.com'  |
-| SSO_API_PORT                   |         8080          |
-| COMMON_API_CLIENT_LOGGING_MODE | 0, 10, 20, 30, 40, 50 |
+|            env variable         |         value         |
+|               ---               |          ---          |
+| COMMON_API_CLIENT_LOGGING_LEVEL |           40          |
+see numeric represents logging level here: https://docs.python.org/3/library/logging.html#logging-levels
