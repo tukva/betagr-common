@@ -16,7 +16,10 @@ if __name__ == "__main__":
         # print(resp)
 
         resp = await client.get(api_uri='parse-links/1/teams')
-        print(resp)
+        print(await resp[0].json())
+
+        resp = await client.get(api_uri='parse-links/2/teams')
+        print(await resp[0].json())
 
 
     loop = asyncio.get_event_loop()

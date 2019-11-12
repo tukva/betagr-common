@@ -21,30 +21,30 @@ class BaseClientSSO(BaseClient):
 
     async def sign_up(self, body):
         url = self._api_uri['sign_up']
-        response = await super().post(url, body=body, cookies=self._cookies)
-        self.update_cookies(response.cookies or {})
+        resp, resp_body = await self.post(url, body=body, cookies=self._cookies)
+        self.update_cookies(resp.cookies or {})
 
-        return response
+        return resp, resp_body
 
 
     async def sign_in(self, body):
         url = self._api_uri['sign_in']
-        response = await super().post(url, body=body, cookies=self._cookies)
-        self.update_cookies(response.cookies or {})
+        resp, resp_body = await self.post(url, body=body, cookies=self._cookies)
+        self.update_cookies(resp.cookies or {})
 
-        return response
+        return resp, resp_body
 
 
     async def sign_out(self):
         url = self._api_uri['sign_out']
-        response = await self.post(url, cookies=self._cookies)
-        self.update_cookies(response.cookies or {})
+        resp, resp_body = await self.post(url, cookies=self._cookies)
+        self.update_cookies(resp.cookies or {})
 
-        return response
+        return resp, resp_body
 
     async def reset_password(self, body):
         url = self._api_uri['reset_password']
-        response = await super().patch(url, body=body, cookies=self._cookies)
-        self.update_cookies(response.cookies or {})
+        resp, resp_body = await self.patch(url, body=body, cookies=self._cookies)
+        self.update_cookies(resp.cookies or {})
 
-        return response
+        return resp, resp_body

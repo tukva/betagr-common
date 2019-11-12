@@ -13,8 +13,6 @@ def start_logging(client):
     logging_mode = os.getenv('COMMON_API_CLIENT_LOGGING_MODE', 10)  # debug by default
 
     logging.basicConfig(level=int(logging_mode),
-                        filename='app.log',
-                        filemode='w',
                         format='[%(asctime)s] - [%(levelname)s] - %(message)s',
                         datefmt='%d-%m-%y %H:%M:%S')
 
@@ -24,9 +22,11 @@ def start_logging(client):
                  f' headers - {client.headers}')
 
 def response(client, response):
+    method = response.method
+    url = response.url
     status = response.status
     reason = response.reason
 
-    msg = f'response for {client.__class__.__name__}: "{status} {reason}"'
+    msg = f'response for {client.__class__.__name__}: {method} {url} "{status} {reason}"'
 
     logging.info(msg)
