@@ -1,8 +1,8 @@
 import aiohttp
 import logging
 
-from utils import logger as log
-from utils.utils import prepared_data
+from ..utils import logger as log
+from ..utils.utils import prepared_data
 
 
 class BaseClient:

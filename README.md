@@ -4,7 +4,7 @@ A set of tools, utilities and base async api-classes for maintaining the infrast
 
 ### Requirements
 
-* python>=3.7
+* python>=3.6
 * aiohttp>=3.6
 
 ### Usage
@@ -132,4 +132,5 @@ Environment variables are used to determine url/connection parameters in base cl
 |            env variable         |         value         |
 |               ---               |          ---          |
 | COMMON_API_CLIENT_LOGGING_LEVEL |           40          |
+
 see numeric represents logging level here: https://docs.python.org/3/library/logging.html#logging-levels
